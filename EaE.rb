@@ -1,7 +1,7 @@
 #require 'gnuplot'
 
-MAX_TA = 90
-MAX_IA = 60
+MAX_TA = 60
+MAX_IA = 30
 
 HIGH_VALUE = 99999
 DIA_DE_ALTA_FRECUENCIA = false
@@ -210,12 +210,13 @@ class Simulador
 
     #IMPRESION DE RESULTADOS
 
-      puts "\n\n\n/-/-/-/-/-/ RESULTADOS /-/-/-/-/-/","Cantidad de medicos: "+ @m.to_s , "PEC:"+pec.to_s, "POC de cada medico respectivamente: \n["+ poc.join(' - ')+ "]\n"
+    puts "\n\n\n/-/-/-/-/-/ RESULTADOS /-/-/-/-/-/","Cantidad de medicos: "+ @m.to_s , "PEC:"+pec.to_s, "POC de cada medico respectivamente: \n["+ poc.join(' - ')+ "]\n"
+    return [pec, poc]
   end
 
 end
 
 
 
-Simulador.new(8, 1440*30).run
+#Simulador.new(8, 1440*30).run
 
