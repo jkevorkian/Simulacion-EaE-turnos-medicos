@@ -1,11 +1,13 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    rubyvis (0.7.0)
 
 PLATFORMS
   x64-mingw-ucrt
 
 DEPENDENCIES
+  rubyvis
 
 BUNDLED WITH
    2.3.7
