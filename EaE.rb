@@ -5,6 +5,7 @@ MAX_IA = 60
 
 HIGH_VALUE = 99999
 DIA_DE_ALTA_FRECUENCIA = false
+LOGGEAR = false
 
 class Simulador
   attr_accessor :m
@@ -52,17 +53,28 @@ class Simulador
 
   def run
 
+      puts "\n\n\n/-/-/-/-/-/ NUEVA SIMULACION /-/-/-/-/-/"
     while @t<@tf
-      i = menor_tps
-      puts "\n\n\nnueva iteracion\n"
-      puts "Estado de los medicos:\n["+@tps.join(' - ')+"]"
-      puts "t: "+@t.to_s, "i: " + i.to_s, "menor tps: " + @tps[i].to_s, "tpll: " + @tpll.to_s
+      @i = menor_tps
+      if LOGGEAR
+        puts "\n\n\nnueva iteracion\n"
+      end
+      if LOGGEAR
+        puts "Estado de los medicos:\n["+@tps.join(' - ')+"]"
+      end
+      if LOGGEAR
+        puts "t: "+@t.to_s,"tf: "+@tf.to_s, "nuevo i: " + @i.to_s, "menor tps: " + @tps[@i].to_s, "tpll: " + @tpll.to_s
+      end
 
-      if @tpll<=@tps[i]
-        puts "\nprox evento es llegada: "
+      if @tpll<=@tps[@i]
+        if LOGGEAR
+          puts "\nprox evento es llegada: "
+        end
         llegada
       else
-        puts "\nprox evento es salida: "
+        if LOGGEAR
+          puts "\nprox evento es salida: "
+        end
         salida
       end
     end
@@ -75,28 +87,44 @@ class Simulador
       @tpll = @t + ia
       @ns = @ns + 1
       @nt = @nt + 1
-      puts "nuevo tpll es: "+@tpll.to_s, "NS ahora: " + @ns.to_s
+      if LOGGEAR
+        puts "NS ahora: " + @ns.to_s, "ia es: "+ia.to_s+", entonces nuevo tpll es: "+@tpll.to_s
+      end
       if @ns<=@m
         @i = busco_medico
-        @sto[i] = @sto[i] + @t - @ito[i]
+        @sto[@i] = @sto[@i] + @t - @ito[@i]
         aux_ta = ta
-        @tps[i] = @t + aux_ta
+        @tps[@i] = @t + aux_ta
         @sta = @sta + aux_ta
-        puts "el medico numero "+@i.to_s+" estaba libre! \nsu ta es "+aux_ta.to_s+" y entonces su nuevo tps es "+@tps[i].to_s
+        if LOGGEAR
+          puts "el medico numero "+@i.to_s+" estaba libre! \nsu ta es "+aux_ta.to_s+" y entonces su nuevo tps es "+@tps[@i].to_s
+        end
       end
   end
 
   def salida
-      @sps = @sps + (@tps[i] - @t)*@ns
-      @t = @tps[i]
+    if LOGGEAR
+      puts @i.to_s
+    end
+      @sps = @sps + (@tps[@i] - @t)*@ns
+      @t = @tps[@i]
       @ns = @ns - 1
+      if LOGGEAR
+        puts "NS ahora: "+@ns.to_s
+      end
       if @ns>=@m
         aux_ta = ta
         @tps[i] = @t + aux_ta
         @sta = @sta + aux_ta
+        if LOGGEAR
+          puts "todavia hay gente esperando en la fila!\nnuevo tps del medico "+@i.to_s+": "+@tps[@i].to_s
+        end
       else
-        @ito[i] = @t
-        @tps[i] = HIGH_VALUE
+        @ito[@i] = @t
+        @tps[@i] = HIGH_VALUE
+        if LOGGEAR
+          puts "no hay nadie mas en la fila!\nel nuevo ito del medico numero "+@i.to_s+" es: "+@ito[@i].to_s+" y su tps es entonces "+@tps[@i].to_s
+        end
       end
   end
 
@@ -141,7 +169,8 @@ class Simulador
       x = rand(MAX_TA*60)
       y = rand(0.1)
       ordenada_de_x = (Math::E**((-0.5)*((x-1307.7058))/413.6817)**2)/413.6817*(6.2838**0.5)
-      #puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
+      #if LOGGEAR
+      # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
     end
 
     x/60
@@ -164,7 +193,8 @@ class Simulador
         ordenada_de_x = Math::E**((-0.5)*((x-1307.7058)/413.6817)**2)/413.6817*(6.2838**0.5)
       else   ordenada_de_x = (Math::E**((-1/2)*((x-615.9447)/325.4896)**2))/(325.4896*(6.2838)**(1/2))
       end
-      #puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
+      #if LOGGEAR
+      # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
     end
 
     x/60   #el retorno se divide por 60 para que el resultado este en minutos
@@ -179,7 +209,8 @@ class Simulador
     end
 
     #IMPRESION DE RESULTADOS
-    puts 'Cantidad de medicos: ',@m , 'pec:', pec,"\n", 'poc[i]: ', poc.join(' '), "\n"
+
+      puts "\n\n\n/-/-/-/-/-/ RESULTADOS /-/-/-/-/-/","Cantidad de medicos: "+ @m.to_s , "PEC:"+pec.to_s, "POC de cada medico respectivamente: \n["+ poc.join(' - ')+ "]\n"
   end
 
 end
