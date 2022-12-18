@@ -1,23 +1,34 @@
 require_relative 'EaE'
-
-UN_DIA = 1440
-RANGO_M = 10
-
-promedio_espera_en_cola = []
-porcentaje_tiempo_ocioso_medicos = []
-
-
-
-for i in 1..RANGO_M
-  resultado = Simulador.new(i, UN_DIA*10).run
-  #promedio_espera_en_cola[i] = resultado[0]
-  #porcentaje_tiempo_ocioso_medicos[i] = resultado[1]
+class Array
+  def second
+    self.length <= 1 ? nil : self[1]
+  end
 end
 
-#for i in 1..RANGO_M
-#  puts "Sim #"+i.to_s
-#  puts promedio_espera_en_cola, porcentaje_tiempo_ocioso_medicos.join(' - ')
-#  puts "\n\n"
-#end
+
+UN_DIA = 1440
+RANGO_M = 9
+
+class Ejecucion
+  attr_accessor :resultado
+  def initialize
+    resultado = [RANGO_M+1]
+    #for i in 0..RANGO_M-1
+    #resultado[]
+    #end
+    for i in 1..RANGO_M
+      resultado[i] = Simulador.new(i, UN_DIA*10).run
+    end
+    puts "\n\n\n---------PRINTEO DE RESULTADOS FINALES-----------"
+    for i in 1..RANGO_M
+
+    puts "Sim #"+i.to_s+". M: "+i.to_s+"  PEC: "+resultado[i].first.to_s+"     PTO: "+resultado[i].second.to_s
+    end
+  end
+end
+
+Ejecucion.new
+
+
 
 
