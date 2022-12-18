@@ -4,12 +4,12 @@ MAX_IA = 27
 DIA_DE_ALTA_FRECUENCIA = false
 
 def ta
-  x = rand(MAX_TA*60-MIN_TA)+MIN_TA
+  x = rand(MAX_TA*60)
   y = rand(0.1)
   ordenada_de_x = (Math::E**((-1/2)*((x-1388.1014)/351.7452)**2))/(351.7452*(6.2838)**(1/2))
 
   while y >= ordenada_de_x
-    x = rand(MAX_TA*60-MIN_TA)+MIN_TA
+    x = rand(MAX_TA*60)
     y = rand(0.1)
     ordenada_de_x = (Math::E**((-1/2)*((x-1388.1014)/351.7452)**2))/(351.7452*(6.2838)**(1/2))
     #if LOGGEAR
@@ -48,14 +48,14 @@ end
 auxta = []
 auxia = []
 for i in 1..1000
-  # puts ta
+  #puts ta
   #puts ia
   auxta.append ta
-  #auxia.append ia
+  auxia.append ia
 end
 
 #puts ta
 #puts ia
 
 puts auxta.sum/1000
-#puts auxia.sum/1000
+puts auxia.sum/1000
