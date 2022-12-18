@@ -1,17 +1,24 @@
 #require 'gnuplot'
 
-MAX_TA = 60
+#ESTAS COTAS SON PARA EL METODO DEL RECHAZO
+MAX_TA = 40
 MAX_IA = 30
 
 HIGH_VALUE = 99999
 DIA_DE_ALTA_FRECUENCIA = false
-LOGGEAR = false
+LOGGEAR = true
+
+#FDP_TA = (Math::E**((-1/2)*((Math.log(x)-1331.5949)/369.7252)**2))/(x*369.7252*(6.2838)**(1/2))
+#FDP_IASta = (Math::E**((-1/2)*((Math.log(x)-670.8931)/318.5512)**2))/(x*318.5512*(6.2838)**(1/2))
+#FDP_IAPlus = (Math::E**((-1/2)*((Math.log(x)-515.1173)/341.4035)**2))/(x*341.4035*(6.2838)**(1/2))
 
 class Simulador
   attr_accessor :m
   attr_accessor :tf
   attr_accessor :t
-  attr_accessor :sps
+  #attr_accessor :sps
+  attr_accessor :stll
+  attr_accessor :sts
   attr_accessor :sta
   attr_accessor :nt
   attr_accessor :sto
@@ -27,7 +34,9 @@ class Simulador
 
     @tf = tiempo_final      #Tiempo simulado a partir del cual se termina la simulación, sirve para acotar el tiempo de ejecución
     @t = 0                  #Tiempo actual durante la simulacion, en minutos
-    @sps = 0
+    #@sps = 0
+    @stll = 0
+    @sts = 0
     @sta = 0
     @nt = 0
     @sto = []
@@ -64,6 +73,9 @@ class Simulador
       end
       if LOGGEAR
         puts "t: "+@t.to_s,"tf: "+@tf.to_s, "nuevo i: " + @i.to_s, "menor tps: " + @tps[@i].to_s, "tpll: " + @tpll.to_s
+        if @t>0
+          puts "pec: "+((@sts - @stll - @sta)/@nt).to_s, "pto prom: "+((((@sto.sum)/@m) * 100)/@t).to_s
+        end
       end
 
       if @tpll<=@tps[@i]
@@ -82,13 +94,16 @@ class Simulador
 
   end
   def llegada
-      @sps = @sps + (@tpll-@t)*@ns
+    #@sps = @sps + (@tpll-@t)*@ns
       @t = @tpll
-      @tpll = @t + ia
+
+      aux_ia = ia
+      @tpll = @t + aux_ia
+      @stll = @stll + @t
       @ns = @ns + 1
       @nt = @nt + 1
       if LOGGEAR
-        puts "NS ahora: " + @ns.to_s, "ia es: "+ia.to_s+", entonces nuevo tpll es: "+@tpll.to_s
+        puts "el tiempo avanza, t: "+@t.to_s, "NS ahora: " + @ns.to_s, "ia es: "+aux_ia.to_s+", entonces nuevo tpll es: "+@tpll.to_s,"stll: "+@stll.to_s
       end
       if @ns<=@m
         @i = busco_medico
@@ -97,27 +112,28 @@ class Simulador
         @tps[@i] = @t + aux_ta
         @sta = @sta + aux_ta
         if LOGGEAR
-          puts "el medico numero "+@i.to_s+" estaba libre! \nsu ta es "+aux_ta.to_s+" y entonces su nuevo tps es "+@tps[@i].to_s
+          puts "el medico numero "+@i.to_s+" estaba libre! \nsu ta es "+aux_ta.to_s+" y entonces su nuevo tps es "+@tps[@i].to_s, "nuevo sta es: "+@sta.to_s
         end
       end
   end
 
   def salida
     if LOGGEAR
-      puts @i.to_s
+      puts "i:"+@i.to_s
     end
-      @sps = @sps + (@tps[@i] - @t)*@ns
+    #@sps = @sps + (@tps[@i] - @t)*@ns
       @t = @tps[@i]
       @ns = @ns - 1
+      @sts = @sts + @t
       if LOGGEAR
-        puts "NS ahora: "+@ns.to_s
+        puts "NS ahora: "+@ns.to_s, "sts: "+@sts.to_s
       end
       if @ns>=@m
         aux_ta = ta
         @tps[i] = @t + aux_ta
         @sta = @sta + aux_ta
         if LOGGEAR
-          puts "todavia hay gente esperando en la fila!\nnuevo tps del medico "+@i.to_s+": "+@tps[@i].to_s
+          puts "todavia hay gente esperando en la fila!\nnuevo tps del medico "+@i.to_s+": "+@tps[@i].to_s+". sta: "+@sta.to_s
         end
       else
         @ito[@i] = @t
@@ -161,19 +177,19 @@ class Simulador
     i
   end
   def ta
-    x = rand(MAX_TA*60)
+    x = rand(MAX_TA*60)+
     y = rand(0.1)
-    ordenada_de_x = Math::E**((-0.5)*((x-1307.7058)/413.6817)**2)/413.6817*(6.2838**0.5)
+    ordenada_de_x = (Math::E**((-1/2)*((x-1388.1014)/351.7452)**2))/(351.7452*(6.2838)**(1/2))
 
-    while y > ordenada_de_x
-      x = rand(MAX_TA*60)
+    while y >= ordenada_de_x
+      x = rand(MAX_TA*60)+
       y = rand(0.1)
-      ordenada_de_x = (Math::E**((-0.5)*((x-1307.7058))/413.6817)**2)/413.6817*(6.2838**0.5)
+      ordenada_de_x = (Math::E**((-1/2)*((x-1388.1014)/351.7452)**2))/(351.7452*(6.2838)**(1/2))
       #if LOGGEAR
       # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
     end
 
-    x/60
+    (x/60).round
     #return 413.6817*(Math.sqrt((Math.log(r*1036.996968))/-0.5))+1307.7058  #la inversa no tiene valores reales para el dominio
   end
 
@@ -182,41 +198,45 @@ class Simulador
     x = rand(MAX_IA*60)
     y = rand(0.1)
     if DIA_DE_ALTA_FRECUENCIA
-      ordenada_de_x = Math::E**((-0.5)*((x-1307.7058)/413.6817)**2)/413.6817*(6.2838**0.5)
-    else   ordenada_de_x = (Math::E**((-1/2)*((x-615.9447)/325.4896)**2))/(325.4896*(6.2838)**(1/2))
+      ordenada_de_x = ((360.0000/2.0000)*((x/2.0000)**(360.0000-1))*((1+(x/2.0000)**360.0000)**(-2)))
+    else
+      ordenada_de_x = ((Math::E**((-1/2)*((x-923.8289)/329.2884)**2))/(329.2884*(6.2838)**(1/2)))
     end
 
-    while y > ordenada_de_x
+    while y >= ordenada_de_x
       x = rand(MAX_IA*60)
       y = rand(0.1)
       if DIA_DE_ALTA_FRECUENCIA
-        ordenada_de_x = Math::E**((-0.5)*((x-1307.7058)/413.6817)**2)/413.6817*(6.2838**0.5)
-      else   ordenada_de_x = (Math::E**((-1/2)*((x-615.9447)/325.4896)**2))/(325.4896*(6.2838)**(1/2))
+        ordenada_de_x = ((360.0000/2.0000)*((x/2.0000)**(360.0000-1))*((1+(x/2.0000)**360.0000)**(-2)))
+      else
+        ordenada_de_x = ((Math::E**((-1/2)*((x-923.8289)/329.2884)**2))/(329.2884*(6.2838)**(1/2)))
       end
       #if LOGGEAR
       # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
     end
 
-    x/60   #el retorno se divide por 60 para que el resultado este en minutos
+    (x/60).round  #el retorno se divide por 60 para que el resultado este en minutos
   end
 
   def calculo_e_impresion_resultados
     #CALCULO DE RESULTADOS
-    pec = (@sps-@sta)/@nt
-    poc = []
+    #pec = (@sps-@sta)/@nt
+    pec = (@sts - @stll - @sta)/@nt
+    pto = []
     for i in 0..@m-1
-      poc[i] = (@sto[i]*100)/@t
+      pto[i] = (@sto[i]*100)/@t
     end
+    #pto = (((@sto.sum)/@m) * 100)/@t
 
     #IMPRESION DE RESULTADOS
 
-    puts "\n\n\n/-/-/-/-/-/ RESULTADOS /-/-/-/-/-/","Cantidad de medicos: "+ @m.to_s , "PEC:"+pec.to_s, "POC de cada medico respectivamente: \n["+ poc.join(' - ')+ "]\n"
-    return [pec, poc]
+    puts "\n\n\n/-/-/-/-/-/ RESULTADOS /-/-/-/-/-/","Cantidad de medicos: "+ @m.to_s , "PEC:"+pec.to_s, "PTO de cada medico respectivamente: \n["+ pto.join(' - ') + "]\n"
+    return [pec, pto]
   end
 
 end
 
 
 
-#Simulador.new(8, 1440*30).run
+Simulador.new(2, 1000).run
 

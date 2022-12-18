@@ -1,46 +1,61 @@
-#require_relative 'EaE'
-#require 'rubyvis'
+MAX_TA = 40
+MIN_TA = 9
+MAX_IA = 27
+DIA_DE_ALTA_FRECUENCIA = false
 
-#(Math::E**((-1/2)*(((Math.log x)-621.1868)/357.7142)**2))/(x*357.7142*(6.2838)**(1/2))  #Log-normal
-#(Math::E**((-1/2)*((x-615.9447)/325.4896)**2))/(325.4896*(6.2838)**(1/2)) #normal
+def ta
+  x = rand(MAX_TA*60-MIN_TA)+MIN_TA
+  y = rand(0.1)
+  ordenada_de_x = (Math::E**((-1/2)*((x-1388.1014)/351.7452)**2))/(351.7452*(6.2838)**(1/2))
 
-HIGH_VALUE = 99999
-
-
-class Prueba
-  attr_accessor :m
-  attr_accessor :tps
-
-  def initialize
-    @m = 5
-    @tps = [HIGH_VALUE,HIGH_VALUE,HIGH_VALUE,HIGH_VALUE,HIGH_VALUE]
-    #for i in 0..m-1
-    #  @tps[i] = HIGH_VALUE
-    #end
+  while y >= ordenada_de_x
+    x = rand(MAX_TA*60-MIN_TA)+MIN_TA
+    y = rand(0.1)
+    ordenada_de_x = (Math::E**((-1/2)*((x-1388.1014)/351.7452)**2))/(351.7452*(6.2838)**(1/2))
+    #if LOGGEAR
+    # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
   end
 
-  def menor_tps
-    i = 0
-    j = 0
-
-
-    while j<m
-
-      puts @tps.join ' '
-      puts i
-      unless tps[i] <= tps[j]
-        i = j
-      end
-      j = j + 1
-    end
-    i
-  end
+  x/60
+  #return 413.6817*(Math.sqrt((Math.log(r*1036.996968))/-0.5))+1307.7058  #la inversa no tiene valores reales para el dominio
 end
 
+def ia
 
-panda = Prueba.new
-puts panda.menor_tps
+  x = rand(MAX_IA*60)
+  y = rand(0.1)
+  if DIA_DE_ALTA_FRECUENCIA
+    ordenada_de_x = ((360.0000/2.0000)*((x/2.0000)**(360.0000-1))*((1+(x/2.0000)**360.0000)**(-2)))
+  else
+    ordenada_de_x = ((Math::E**((-1/2)*((x-923.8289)/329.2884)**2))/(329.2884*(6.2838)**(1/2)))
+  end
 
+  while y >= ordenada_de_x
+    x = rand(MAX_IA*60)
+    y = rand(0.1)
+    if DIA_DE_ALTA_FRECUENCIA
+      ordenada_de_x = ((360.0000/2.0000)*((x/2.0000)**(360.0000-1))*((1+(x/2.0000)**360.0000)**(-2)))
+    else
+      ordenada_de_x = ((Math::E**((-1/2)*((x-923.8289)/329.2884)**2))/(329.2884*(6.2838)**(1/2)))
+    end
+    #if LOGGEAR
+    # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
+  end
 
+  x/60   #el retorno se divide por 60 para que el resultado este en minutos
+end
 
+auxta = []
+auxia = []
+for i in 1..1000
+  # puts ta
+  #puts ia
+  auxta.append ta
+  #auxia.append ia
+end
 
+#puts ta
+#puts ia
+
+puts auxta.sum/1000
+#puts auxia.sum/1000
