@@ -7,7 +7,7 @@ end
 
 
 UN_DIA = 1440
-RANGO_M = 9
+RANGO_M = 5
 
 class Ejecucion
   attr_accessor :resultado
@@ -17,7 +17,7 @@ class Ejecucion
     #resultado[]
     #end
     for i in 1..RANGO_M
-      resultado[i] = Simulador.new(i, UN_DIA*10).run
+      resultado[i] = Simulador.new(i, UN_DIA*30*6).run
     end
     puts "\n\n\n---------PRINTEO DE RESULTADOS FINALES-----------"
     for i in 1..RANGO_M

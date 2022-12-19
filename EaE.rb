@@ -65,7 +65,7 @@ class Simulador
     corriendo = true
     vaciando = false
       puts "\n\n\n/-/-/-/-/-/ NUEVA SIMULACION /-/-/-/-/-/"
-    while vaciando || corriendo
+    while (vaciando || corriendo)
       if @t>@tf
         corriendo = false
         vaciando = true
@@ -189,56 +189,45 @@ class Simulador
     i
   end
   def ta
+    x = rand(MAX_TA*60)
+    y = rand(0.1)
+    ordenada_de_x = (Math::E**((-1/2)*((x-1598.7308)/584.3439)**2))/(584.3439*(6.2838)**(1/2))
 
-    if not CHEATS
+    while y >= ordenada_de_x
       x = rand(MAX_TA*60)
       y = rand(0.1)
-      ordenada_de_x = (Math::E**((-1/2)*((x-1388.1014)/351.7452)**2))/(351.7452*(6.2838)**(1/2))
-
-      while y >= ordenada_de_x
-        x = rand(MAX_TA*60)
-        y = rand(0.1)
-        ordenada_de_x = (Math::E**((-1/2)*((x-1388.1014)/351.7452)**2))/(351.7452*(6.2838)**(1/2))
-        #if LOGGEAR
-        # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
-      end
-
-      x/60
-
-     else rand(30+10)-10
+      ordenada_de_x = (Math::E**((-1/2)*((x-1598.7308)/584.3439)**2))/(584.3439*(6.2838)**(1/2))
+      #if LOGGEAR
+      # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
     end
+
+    x/60
+    #return 413.6817*(Math.sqrt((Math.log(r*1036.996968))/-0.5))+1307.7058  #la inversa no tiene valores reales para el dominio
   end
 
   def ia
-    if not CHEATS
+
+    x = rand(MAX_IA*60)
+    y = rand(0.1)
+    if DIA_DE_ALTA_FRECUENCIA
+      ordenada_de_x = (420.0000/2.0000)*((x/2.0000)**(420.0000-1))*((1+(x/2.0000)**420.0000)**(-2))
+    else
+      ordenada_de_x = (Math::E**((-1/2)*((x-1448.9089)/477.7157)**2))/(477.7157*(6.2838)**(1/2))
+    end
+
+    while y >= ordenada_de_x
       x = rand(MAX_IA*60)
       y = rand(0.1)
       if DIA_DE_ALTA_FRECUENCIA
-        ordenada_de_x = ((360.0000/2.0000)*((x/2.0000)**(360.0000-1))*((1+(x/2.0000)**360.0000)**(-2)))
+        ordenada_de_x = (420.0000/2.0000)*((x/2.0000)**(420.0000-1))*((1+(x/2.0000)**420.0000)**(-2))
       else
-        ordenada_de_x = ((Math::E**((-1/2)*((x-923.8289)/329.2884)**2))/(329.2884*(6.2838)**(1/2)))
+        ordenada_de_x = (Math::E**((-1/2)*((x-1448.9089)/477.7157)**2))/(477.7157*(6.2838)**(1/2))
       end
-
-      while y >= ordenada_de_x
-        x = rand(MAX_IA*60)
-        y = rand(0.1)
-        if DIA_DE_ALTA_FRECUENCIA
-          ordenada_de_x = ((360.0000/2.0000)*((x/2.0000)**(360.0000-1))*((1+(x/2.0000)**360.0000)**(-2)))
-        else
-          ordenada_de_x = ((Math::E**((-1/2)*((x-923.8289)/329.2884)**2))/(329.2884*(6.2838)**(1/2)))
-        end
-        #if LOGGEAR
-        # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
-      end
-
-      x/60   #el retorno se divide por 60 para que el resultado este en minutos
-    else
-      if DIA_DE_ALTA_FRECUENCIA
-        rand(7+2)-2
-      else rand(15+7)-7
-      end
+      #if LOGGEAR
+      # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
     end
 
+    x/60   #el retorno se divide por 60 para que el resultado este en minutos
   end
 
   def calculo_e_impresion_resultados
@@ -261,5 +250,5 @@ end
 
 
 
-#Simulador.new(5, 1440*60).run
+#Simulador.new(1, 1440*6*30).run
 
