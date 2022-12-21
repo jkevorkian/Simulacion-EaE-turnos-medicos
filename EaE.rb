@@ -1,23 +1,15 @@
-#require 'gnuplot'
-
 #ESTAS COTAS SON PARA EL METODO DEL RECHAZO
 MAX_TA = 40
 MAX_IA = 30
 
 HIGH_VALUE = 99999
-DIA_DE_ALTA_FRECUENCIA = true
-CHEATS = true
+DIA_DE_ALTA_FRECUENCIA = false
 LOGGEAR = false
-
-#FDP_TA = (Math::E**((-1/2)*((Math.log(x)-1331.5949)/369.7252)**2))/(x*369.7252*(6.2838)**(1/2))
-#FDP_IASta = (Math::E**((-1/2)*((Math.log(x)-670.8931)/318.5512)**2))/(x*318.5512*(6.2838)**(1/2))
-#FDP_IAPlus = (Math::E**((-1/2)*((Math.log(x)-515.1173)/341.4035)**2))/(x*341.4035*(6.2838)**(1/2))
 
 class Simulador
   attr_accessor :m
   attr_accessor :tf
   attr_accessor :t
-  #attr_accessor :sps
   attr_accessor :stll
   attr_accessor :sts
   attr_accessor :sta
@@ -35,7 +27,6 @@ class Simulador
 
     @tf = tiempo_final      #Tiempo simulado a partir del cual se termina la simulación, sirve para acotar el tiempo de ejecución
     @t = 0                  #Tiempo actual durante la simulacion, en minutos
-    #@sps = 0
     @stll = 0
     @sts = 0
     @sta = 0
@@ -156,7 +147,8 @@ class Simulador
       end
   end
 
-    #FUNCIONES AUXILIARES
+
+  #FUNCIONES AUXILIARES
   def menor_tps
     i = 0
     j = 0
@@ -188,6 +180,7 @@ class Simulador
     end
     i
   end
+
   def ta
     x = rand(MAX_TA*60)
     y = rand(0.1)
@@ -197,16 +190,12 @@ class Simulador
       x = rand(MAX_TA*60)
       y = rand(0.1)
       ordenada_de_x = (Math::E**((-1/2)*((x-1598.7308)/584.3439)**2))/(584.3439*(6.2838)**(1/2))
-      #if LOGGEAR
-      # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
     end
 
-    x/60
-    #return 413.6817*(Math.sqrt((Math.log(r*1036.996968))/-0.5))+1307.7058  #la inversa no tiene valores reales para el dominio
+    x/60   #el retorno se divide por 60 para que el resultado este en minutos
   end
 
   def ia
-
     x = rand(MAX_IA*60)
     y = rand(0.1)
     if DIA_DE_ALTA_FRECUENCIA
@@ -223,8 +212,6 @@ class Simulador
       else
         ordenada_de_x = (Math::E**((-1/2)*((x-1448.9089)/477.7157)**2))/(477.7157*(6.2838)**(1/2))
       end
-      #if LOGGEAR
-      # puts "x: ",x,"\n","y: ",y, "\n", "ordenada: ",ordenada_de_x, "\n\n"
     end
 
     x/60   #el retorno se divide por 60 para que el resultado este en minutos
@@ -232,23 +219,16 @@ class Simulador
 
   def calculo_e_impresion_resultados
     #CALCULO DE RESULTADOS
-    #pec = (@sps-@sta)/@nt
     pec = (@sts - @stll - @sta)/@nt
     pto = []
     for i in 0..@m-1
       pto[i] = (@sto[i]*100)/@t
     end
-    #pto = (((@sto.sum)/@m) * 100)/@t
+
 
     #IMPRESION DE RESULTADOS
-
     puts "\n\n\n/-/-/-/-/-/ RESULTADOS /-/-/-/-/-/","Cantidad de medicos: "+ @m.to_s , "PEC:"+pec.to_s, "PTO de cada medico respectivamente: \n["+ pto.join(' - ') + "]\n"
     return [pec, pto]
   end
-
 end
-
-
-
-#Simulador.new(1, 1440*6*30).run
 
